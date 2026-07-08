@@ -29,3 +29,8 @@ export const deleteCourse = async (id) => {
   const response = await API.delete(`/courses/${id}`);
   return response.data;
 };
+
+export const getMyCourses = async () => {
+  const response = await API.get("/courses/my-courses");
+  return response.data;
+};

@@ -9,6 +9,7 @@ import CourseDetails from "./pages/CourseDetails";
 import Dashboard from "./pages/Dashboard";
 import CreateCourse from "./pages/CreateCourse";
 import ProtectedRoute from "./components/ProtectedRoute";
+import MyCourses from "./pages/MyCourses";
 
 function App() {
   return (
@@ -23,6 +24,14 @@ function App() {
         <Route path="/courses" element={<Courses />} />
 
         <Route path="/courses/:id" element={<CourseDetails />} />
+
+        <Route
+  path="/my-courses"
+  element={ <ProtectedRoute>
+              <MyCourses />
+             </ProtectedRoute>
+          }
+        />
 
         <Route
           path="/dashboard"

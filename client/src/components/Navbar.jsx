@@ -63,10 +63,17 @@ const Navbar = () => {
                 Dashboard
               </Link>
 
+              <Link to="/my-courses"
+                className="font-medium hover:text-blue-600">
+                My Courses
+              </Link>
+
               <Link to="/create-course"
                   className="font-medium text-gray-700 hover:text-blue-600">
                   Create Course
               </Link>
+
+              
 
               <span className="px-3 py-2 bg-blue-100 text-blue-700 rounded-full font-semibold whitespace-nowrap">
                 👋 {user?.name}
