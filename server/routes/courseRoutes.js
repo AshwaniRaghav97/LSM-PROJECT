@@ -8,7 +8,6 @@ import {
 } from "../controllers/courseController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
-import { authorize } from "../middleware/roleMiddleware.js";
 
 const router = express.Router();
 
@@ -17,10 +16,10 @@ router.get("/", getAllCourses);
 router.get("/:id", getCourseById);
 
 // Protected Routes
-router.post("/", protect, authorize("instructor", "admin"), createCourse);
+router.post("/", protect, createCourse);
 
-router.put("/:id", protect, authorize("instructor", "admin"), updateCourse);
+router.put("/:id", protect, updateCourse);
 
-router.delete("/:id", protect, authorize("instructor", "admin"), deleteCourse);
+router.delete("/:id", protect, deleteCourse);
 
 export default router;
