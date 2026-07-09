@@ -1,4 +1,5 @@
 import express from "express";
+import upload from "../middleware/uploadMiddleware.js";
 import {
   createCourse,
   getAllCourses,
@@ -22,7 +23,12 @@ router.get("/my-courses", protect, getMyCourses);
 router.get("/:id", getCourseById);
 
 // CRUD
-router.post("/", protect, createCourse);
+router.post(
+  "/",
+  protect,
+  upload.single("thumbnail"),
+  createCourse
+);
 router.put("/:id", protect, updateCourse);
 router.delete("/:id", protect, deleteCourse);
 

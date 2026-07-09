@@ -7,6 +7,7 @@ import errorHandler from "./middleware/errorMiddleware.js";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
+import lectureRoutes from "./routes/lectureRoutes.js";
 
 
 const app = express();
@@ -27,6 +28,7 @@ app.use(cookieParser());
 app.use("/api/health", healthRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/courses", courseRoutes);
+app.use("/api/lectures", lectureRoutes);
 
 app.use(notFound);
 

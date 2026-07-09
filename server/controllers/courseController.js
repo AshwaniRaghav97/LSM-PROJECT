@@ -1,3 +1,5 @@
+import cloudinary from "../config/cloudinary.js";
+import streamifier from "streamifier";
 import Course from "../models/Course.js";
 
 // ======================
@@ -14,11 +16,43 @@ export const createCourse = async (req, res) => {
       });
     }
 
+    let thumbnail = "";
+
+    if (req.file) {
+      console.log("========== DEBUG ==========");
+      console.log("File:", req.file);
+      console.log("Cloudinary Config:", cloudinary.config());
+
+      const uploadFromBuffer = () =>
+        new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            {
+              folder: "codelearn-courses",
+            },
+            (error, result) => {
+              console.log("Upload Error:", error);
+              console.log("Upload Result:", result);
+
+              if (error) return reject(error);
+
+              resolve(result);
+            }
+          );
+
+          streamifier.createReadStream(req.file.buffer).pipe(stream);
+        });
+
+      const result = await uploadFromBuffer();
+
+      thumbnail = result.secure_url;
+    }
+
     const course = await Course.create({
       title,
       description,
       price,
       category,
+      thumbnail,
       instructor: req.user._id,
     });
 
@@ -28,13 +62,15 @@ export const createCourse = async (req, res) => {
       course,
     });
   } catch (error) {
+    console.error("========== CREATE COURSE ERROR ==========");
+    console.error(error);
+
     res.status(500).json({
       success: false,
       message: error.message,
     });
   }
 };
-
 // ======================
 // Get All Courses
 // ======================

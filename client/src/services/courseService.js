@@ -14,7 +14,12 @@ export const getCourseById = async (id) => {
 
 // Create Course
 export const createCourse = async (courseData) => {
-  const response = await API.post("/courses", courseData);
+  const response = await API.post("/courses", courseData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
   return response.data;
 };
 
@@ -34,3 +39,4 @@ export const getMyCourses = async () => {
   const response = await API.get("/courses/my-courses");
   return response.data;
 };
+

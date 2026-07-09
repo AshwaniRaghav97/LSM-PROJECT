@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -7,6 +8,7 @@ import { createCourse } from "../services/courseService";
 
 const CreateCourse = () => {
   const navigate = useNavigate();
+  const [preview, setPreview] = useState(null);
 
   const {
     register,
@@ -16,11 +18,22 @@ const CreateCourse = () => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await createCourse(data);
+      const formData = new FormData();
+
+      formData.append("title", data.title);
+      formData.append("description", data.description);
+      formData.append("price", data.price);
+      formData.append("category", data.category);
+
+      if (data.thumbnail && data.thumbnail[0]) {
+        formData.append("thumbnail", data.thumbnail[0]);
+      }
+
+      const response = await createCourse(formData);
 
       toast.success(response.message);
 
-      navigate("/courses");
+      navigate("/my-courses");
     } catch (error) {
       toast.error(
         error.response?.data?.message || "Course Creation Failed"
@@ -53,7 +66,6 @@ const CreateCourse = () => {
                 required: "Title is required",
               })}
             />
-
             <p className="text-red-500 text-sm">
               {errors.title?.message}
             </p>
@@ -71,7 +83,6 @@ const CreateCourse = () => {
                 required: "Description is required",
               })}
             />
-
             <p className="text-red-500 text-sm">
               {errors.description?.message}
             </p>
@@ -89,7 +100,6 @@ const CreateCourse = () => {
                 required: "Price is required",
               })}
             />
-
             <p className="text-red-500 text-sm">
               {errors.price?.message}
             </p>
@@ -107,10 +117,35 @@ const CreateCourse = () => {
                 required: "Category is required",
               })}
             />
-
             <p className="text-red-500 text-sm">
               {errors.category?.message}
             </p>
+          </div>
+
+          <div>
+            <label className="block mb-2 font-medium">
+              Thumbnail
+            </label>
+
+            <input
+              type="file"
+              accept="image/*"
+              className="w-full border rounded-lg px-4 py-3"
+              {...register("thumbnail")}
+              onChange={(e) => {
+                if (e.target.files[0]) {
+                  setPreview(URL.createObjectURL(e.target.files[0]));
+                }
+              }}
+            />
+
+            {preview && (
+              <img
+                src={preview}
+                alt="Preview"
+                className="mt-4 h-48 w-full object-cover rounded-lg"
+              />
+            )}
           </div>
 
           <button

@@ -10,6 +10,9 @@ import Dashboard from "./pages/Dashboard";
 import CreateCourse from "./pages/CreateCourse";
 import ProtectedRoute from "./components/ProtectedRoute";
 import MyCourses from "./pages/MyCourses";
+import EditCourse from "./pages/EditCourse";
+import AddLecture from "./pages/AddLecture";
+import ManageLectures from "./pages/ManageLectures";
 
 function App() {
   return (
@@ -24,6 +27,29 @@ function App() {
         <Route path="/courses" element={<Courses />} />
 
         <Route path="/courses/:id" element={<CourseDetails />} />
+
+        <Route
+            path="/add-lecture/:courseId"
+            element={ <ProtectedRoute> <AddLecture /> 
+            </ProtectedRoute>
+          }
+        />
+        <Route
+  path="/edit-course/:id" element={
+            <ProtectedRoute>
+               <EditCourse />
+            </ProtectedRoute>
+        }
+      />
+
+      <Route
+  path="/manage-lectures/:courseId"
+  element={
+    <ProtectedRoute>
+      <ManageLectures />
+    </ProtectedRoute>
+  }
+/>
 
         <Route
   path="/my-courses"

@@ -35,6 +35,12 @@ const courseSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
+    lectures: [
+  {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Lecture",
+  },
+],
     isPublished: {
       type: Boolean,
       default: false,
@@ -42,7 +48,9 @@ const courseSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
+
+
 
 export default mongoose.model("Course", courseSchema);
