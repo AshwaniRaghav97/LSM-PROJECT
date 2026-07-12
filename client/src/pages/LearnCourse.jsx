@@ -17,6 +17,7 @@ const LearnCourse = () => {
   const [progress, setProgress] = useState({
     percentage: 0,
     completedLectures: [],
+    lastLecture: null,
   });
 
   useEffect(() => {
@@ -29,13 +30,27 @@ const LearnCourse = () => {
 
       setCourse(response.course);
 
-      if (response.course.lectures.length > 0) {
-        setCurrentLecture(response.course.lectures[0]);
-      }
-
       const progressData = await getProgress(courseId);
 
       setProgress(progressData.progress);
+
+      if (response.course.lectures.length > 0) {
+        if (progressData.progress.lastLecture) {
+          const lastLecture = response.course.lectures.find(
+            (lecture) =>
+              lecture._id ===
+              progressData.progress.lastLecture._id
+          );
+
+          if (lastLecture) {
+            setCurrentLecture(lastLecture);
+          } else {
+            setCurrentLecture(response.course.lectures[0]);
+          }
+        } else {
+          setCurrentLecture(response.course.lectures[0]);
+        }
+      }
     } catch (error) {
       console.log(error);
       toast.error("Failed to load course");
@@ -54,6 +69,8 @@ const LearnCourse = () => {
       const progressData = await getProgress(courseId);
 
       setProgress(progressData.progress);
+
+      handleNextLecture();
     } catch (error) {
       console.log(error);
       toast.error("Failed");
@@ -70,7 +87,7 @@ const LearnCourse = () => {
     if (currentIndex < course.lectures.length - 1) {
       setCurrentLecture(course.lectures[currentIndex + 1]);
     } else {
-      toast.success("Course Finished 🎉");
+      toast.success("🎉 Course Finished");
     }
   };
 
@@ -110,11 +127,12 @@ const LearnCourse = () => {
 
             {currentLecture ? (
               <>
+
                 <video
                   controls
-                  onEnded={handleNextLecture}
                   className="w-full rounded-xl"
                   src={currentLecture.videoUrl}
+                  onEnded={handleNextLecture}
                 />
 
                 <h2 className="text-2xl font-bold mt-6">

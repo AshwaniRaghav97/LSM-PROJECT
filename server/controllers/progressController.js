@@ -1,7 +1,9 @@
 import Progress from "../models/Progress.js";
 import Course from "../models/Course.js";
 
+// ==========================
 // Mark Lecture Complete
+// ==========================
 export const markLectureComplete = async (req, res) => {
   try {
     const { courseId, lectureId } = req.params;
@@ -16,6 +18,7 @@ export const markLectureComplete = async (req, res) => {
         user: req.user._id,
         course: courseId,
         completedLectures: [],
+        lastLecture: lectureId,
       });
     }
 
@@ -23,14 +26,18 @@ export const markLectureComplete = async (req, res) => {
       progress.completedLectures.push(lectureId);
     }
 
+    // Save last watched lecture
+    progress.lastLecture = lectureId;
+
     const course = await Course.findById(courseId).populate("lectures");
 
     const totalLectures = course.lectures.length;
     const completedLectures = progress.completedLectures.length;
 
-    progress.percentage = Math.floor(
-      (completedLectures / totalLectures) * 100
-    );
+    progress.percentage =
+      totalLectures === 0
+        ? 0
+        : Math.floor((completedLectures / totalLectures) * 100);
 
     progress.completed = progress.percentage === 100;
 
@@ -49,7 +56,9 @@ export const markLectureComplete = async (req, res) => {
   }
 };
 
+// ==========================
 // Get Progress
+// ==========================
 export const getProgress = async (req, res) => {
   try {
     const { courseId } = req.params;
@@ -57,13 +66,14 @@ export const getProgress = async (req, res) => {
     let progress = await Progress.findOne({
       user: req.user._id,
       course: courseId,
-    });
+    }).populate("lastLecture");
 
     if (!progress) {
       progress = {
         completedLectures: [],
         percentage: 0,
         completed: false,
+        lastLecture: null,
       };
     }
 
@@ -79,7 +89,9 @@ export const getProgress = async (req, res) => {
   }
 };
 
+// ==========================
 // Reset Progress
+// ==========================
 export const resetProgress = async (req, res) => {
   try {
     const { courseId } = req.params;

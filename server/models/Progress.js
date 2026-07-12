@@ -21,6 +21,13 @@ const progressSchema = new mongoose.Schema(
       },
     ],
 
+    // Last watched lecture
+    lastLecture: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Lecture",
+      default: null,
+    },
+
     percentage: {
       type: Number,
       default: 0,
