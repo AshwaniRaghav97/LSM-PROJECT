@@ -173,3 +173,31 @@ export const updateLecture = async (req, res) => {
     });
   }
 };
+
+// ======================
+// Get Course With Lectures
+// ======================
+export const getCourseContent = async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.courseId)
+      .populate("instructor", "name email")
+      .populate("lectures");
+
+    if (!course) {
+      return res.status(404).json({
+        success: false,
+        message: "Course not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      course,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

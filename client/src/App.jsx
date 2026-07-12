@@ -13,6 +13,8 @@ import MyCourses from "./pages/MyCourses";
 import EditCourse from "./pages/EditCourse";
 import AddLecture from "./pages/AddLecture";
 import ManageLectures from "./pages/ManageLectures";
+import MyLearning from "./pages/MyLearning";
+import LearnCourse from "./pages/LearnCourse";
 
 function App() {
   return (
@@ -34,6 +36,24 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+  path="/learn/:courseId"
+  element={
+    <ProtectedRoute>
+      <LearnCourse />
+    </ProtectedRoute>
+  }
+/>
+
+        <Route
+  path="/my-learning"
+  element={
+    <ProtectedRoute>
+      <MyLearning />
+    </ProtectedRoute>
+  }
+/>
         <Route
   path="/edit-course/:id" element={
             <ProtectedRoute>

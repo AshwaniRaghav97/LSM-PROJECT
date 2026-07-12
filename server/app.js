@@ -8,6 +8,8 @@ import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
 import lectureRoutes from "./routes/lectureRoutes.js";
+import enrollmentRoutes from "./routes/enrollmentRoutes.js";
+import progressRoutes from "./routes/progressRoutes.js";
 
 
 const app = express();
@@ -29,6 +31,8 @@ app.use("/api/health", healthRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/lectures", lectureRoutes);
+app.use("/api/enrollment", enrollmentRoutes);
+app.use("/api/progress", progressRoutes);
 
 app.use(notFound);
 

@@ -98,10 +98,9 @@ export const getAllCourses = async (req, res) => {
 // ======================
 export const getCourseById = async (req, res) => {
   try {
-    const course = await Course.findById(req.params.id).populate(
-      "instructor",
-      "name email"
-    );
+    const course = await Course.findById(req.params.id)
+  .populate("instructor", "name email")
+  .populate("students", "_id");
 
     if (!course) {
       return res.status(404).json({

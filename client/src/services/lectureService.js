@@ -32,3 +32,8 @@ export const deleteLecture = async (id) => {
   const response = await API.delete(`/lectures/${id}`);
   return response.data;
 };
+
+export const getCourseContent = async (courseId) => {
+  const response = await API.get(`/lectures/course/${courseId}`);
+  return response.data;
+};

@@ -4,6 +4,7 @@ import upload from "../middleware/uploadMiddleware.js";
 import {
   addLecture,
   getCourseLectures,
+  getCourseContent,
   updateLecture,
   deleteLecture,
 } from "../controllers/lectureController.js";
@@ -35,6 +36,7 @@ router.post(
 );
 
 router.get("/:courseId", protect, getCourseLectures);
+router.get("/course/:courseId", protect, getCourseContent);
 
 router.put("/:id", protect, updateLecture);
 
