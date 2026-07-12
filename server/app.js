@@ -13,6 +13,7 @@ import progressRoutes from "./routes/progressRoutes.js";
 import certificateRoutes from "./routes/certificateRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
+import reviewRoutes from "./routes/reviewRoutes.js";
 
 
 const app = express();
@@ -39,6 +40,7 @@ app.use("/api/progress", progressRoutes);
 app.use("/api/certificates", certificateRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 app.use(notFound);
 

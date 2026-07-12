@@ -9,6 +9,7 @@ import {
   createOrder,
   verifyPayment,
 } from "../services/paymentService";
+import ReviewSection from "../components/ReviewSection";
 
 const CourseDetails = () => {
   const { id } = useParams();
@@ -185,6 +186,7 @@ const CourseDetails = () => {
         )}
 
       </div>
+      <ReviewSection courseId={course._id} />
     </MainLayout>
   );
 };
