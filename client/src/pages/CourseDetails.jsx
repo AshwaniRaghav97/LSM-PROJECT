@@ -5,6 +5,10 @@ import toast from "react-hot-toast";
 import MainLayout from "../layouts/MainLayout";
 import { getCourseById } from "../services/courseService";
 import { enrollCourse } from "../services/enrollmentService";
+import {
+  createOrder,
+  verifyPayment,
+} from "../services/paymentService";
 
 const CourseDetails = () => {
   const { id } = useParams();
@@ -37,24 +41,81 @@ const CourseDetails = () => {
   };
 
   const handleEnroll = async () => {
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      const response = await enrollCourse(id);
+    // Free Course
+    if (course.price === 0) {
+      const response = await enrollCourse(course._id);
 
       toast.success(response.message);
 
       setEnrolled(true);
 
-      fetchCourse();
-    } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Enrollment Failed"
-      );
-    } finally {
-      setLoading(false);
+      return;
     }
-  };
+
+    // Create Razorpay Order
+    const data = await createOrder(course._id);
+
+    const options = {
+      key: data.key,
+      amount: data.order.amount,
+      currency: data.order.currency,
+      name: "CodeLearn LMS",
+      description: course.title,
+      order_id: data.order.id,
+
+      handler: async function (response) {
+        try {
+          await verifyPayment({
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id:
+              response.razorpay_payment_id,
+            razorpay_signature:
+              response.razorpay_signature,
+            courseId: course._id,
+          });
+
+          toast.success("Payment Successful");
+
+          setEnrolled(true);
+        } catch (error) {
+          console.log(error);
+
+          toast.error("Payment Verification Failed");
+        }
+      },
+
+      prefill: {
+        name:
+          JSON.parse(localStorage.getItem("user"))?.name ||
+          "",
+        email:
+          JSON.parse(localStorage.getItem("user"))
+            ?.email || "",
+      },
+
+      theme: {
+        color: "#2563eb",
+      },
+    };
+
+    const razor = new window.Razorpay(options);
+
+    razor.open();
+  } catch (error) {
+    console.log(error);
+
+    toast.error(
+      error.response?.data?.message ||
+        "Enrollment Failed"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
+    
 
   if (!course) {
     return (

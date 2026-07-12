@@ -6,6 +6,7 @@ import {
   getProgress,
   markLectureComplete,
 } from "../services/progressService";
+import { downloadCertificate } from "../services/certificateService";
 import toast from "react-hot-toast";
 
 const LearnCourse = () => {
@@ -77,6 +78,35 @@ const LearnCourse = () => {
     }
   };
 
+  const handleDownloadCertificate = async () => {
+    try {
+      const blob = await downloadCertificate(courseId);
+
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.download = `${course.title}-Certificate.pdf`;
+
+      document.body.appendChild(link);
+
+      link.click();
+
+      link.remove();
+
+      window.URL.revokeObjectURL(url);
+
+      toast.success("Certificate Downloaded");
+    } catch (error) {
+      console.log(error);
+      toast.error(
+        error.response?.data?.message ||
+          "Unable to download certificate"
+      );
+    }
+  };
+
   const handleNextLecture = () => {
     if (!course || !currentLecture) return;
 
@@ -112,8 +142,7 @@ const LearnCourse = () => {
       </MainLayout>
     );
   }
-
-  return (
+    return (
     <MainLayout>
       <div className="max-w-7xl mx-auto py-10 px-5">
 
@@ -123,11 +152,11 @@ const LearnCourse = () => {
 
         <div className="grid md:grid-cols-3 gap-8">
 
+          {/* Left Side */}
           <div className="md:col-span-2">
 
             {currentLecture ? (
               <>
-
                 <video
                   controls
                   className="w-full rounded-xl"
@@ -143,6 +172,7 @@ const LearnCourse = () => {
                   {currentLecture.description}
                 </p>
 
+                {/* Progress */}
                 <div className="mt-8">
 
                   <div className="flex justify-between mb-2">
@@ -166,13 +196,28 @@ const LearnCourse = () => {
 
                 </div>
 
-                <button
-                  onClick={handleComplete}
-                  className="mt-6 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700"
-                >
-                  ✔ Mark Lecture Complete
-                </button>
+                {/* Buttons */}
+                <div className="flex flex-wrap gap-4 mt-6">
 
+                  <button
+                    onClick={handleComplete}
+                    className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700"
+                  >
+                    ✔ Mark Lecture Complete
+                  </button>
+
+                  {progress.percentage === 100 && (
+                    <button
+                      onClick={handleDownloadCertificate}
+                      className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700"
+                    >
+                      📜 Download Certificate
+                    </button>
+                  )}
+
+                </div>
+
+                {/* Previous / Next */}
                 <div className="flex gap-4 mt-5">
 
                   <button
@@ -203,52 +248,59 @@ const LearnCourse = () => {
 
               </>
             ) : (
-              <h2>No Lectures Available</h2>
+              <h2 className="text-center text-2xl">
+                No Lectures Available
+              </h2>
             )}
 
           </div>
 
+          {/* Right Side */}
           <div className="bg-white shadow rounded-xl p-5">
 
             <h2 className="text-2xl font-bold mb-5">
               Course Content
             </h2>
 
-            {course.lectures.map((lecture, index) => (
+            {course.lectures.length === 0 ? (
+              <p>No Lectures</p>
+            ) : (
+              course.lectures.map((lecture, index) => (
 
-              <div
-                key={lecture._id}
-                onClick={() => setCurrentLecture(lecture)}
-                className={`cursor-pointer p-3 rounded-lg mb-3 transition ${
-                  currentLecture?._id === lecture._id
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-100 hover:bg-gray-200"
-                }`}
-              >
+                <div
+                  key={lecture._id}
+                  onClick={() => setCurrentLecture(lecture)}
+                  className={`cursor-pointer p-3 rounded-lg mb-3 transition ${
+                    currentLecture?._id === lecture._id
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-100 hover:bg-gray-200"
+                  }`}
+                >
 
-                <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center">
 
-                  <div>
-                    <p className="font-semibold">
-                      Lecture {index + 1}
-                    </p>
+                    <div>
+                      <p className="font-semibold">
+                        Lecture {index + 1}
+                      </p>
 
-                    <p>{lecture.title}</p>
+                      <p>{lecture.title}</p>
+                    </div>
+
+                    {progress.completedLectures?.includes(
+                      lecture._id
+                    ) && (
+                      <span className="text-green-600 text-xl">
+                        ✔
+                      </span>
+                    )}
+
                   </div>
-
-                  {progress.completedLectures?.includes(
-                    lecture._id
-                  ) && (
-                    <span className="text-green-600 text-xl">
-                      ✔
-                    </span>
-                  )}
 
                 </div>
 
-              </div>
-
-            ))}
+              ))
+            )}
 
           </div>
 

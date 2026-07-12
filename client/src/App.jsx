@@ -15,6 +15,7 @@ import AddLecture from "./pages/AddLecture";
 import ManageLectures from "./pages/ManageLectures";
 import MyLearning from "./pages/MyLearning";
 import LearnCourse from "./pages/LearnCourse";
+import InstructorDashboard from "./pages/InstructorDashboard";
 
 function App() {
   return (
@@ -37,6 +38,10 @@ function App() {
           }
         />
 
+        <Route
+           path="/instructor-dashboard"
+            element={<InstructorDashboard />}
+          /> 
         <Route
   path="/learn/:courseId"
   element={
