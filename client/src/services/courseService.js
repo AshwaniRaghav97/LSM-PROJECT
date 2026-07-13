@@ -1,8 +1,25 @@
 import API from "./axios";
 
 // Get All Courses
-export const getCourses = async () => {
-  const response = await API.get("/courses");
+export const getCourses = async ({
+  search = "",
+  category = "",
+  minPrice = 0,
+  maxPrice = 1000000,
+  page = 1,
+  sort = "latest",
+} = {}) => {
+  const response = await API.get("/courses", {
+    params: {
+      search,
+      category,
+      minPrice,
+      maxPrice,
+      page,
+      sort,
+    },
+  });
+
   return response.data;
 };
 

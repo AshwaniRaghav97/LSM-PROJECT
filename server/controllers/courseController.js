@@ -72,20 +72,81 @@ export const createCourse = async (req, res) => {
   }
 };
 // ======================
-// Get All Courses
+// Get All Courses (Search + Filter + Pagination)
 // ======================
 export const getAllCourses = async (req, res) => {
   try {
-    const courses = await Course.find()
+    const {
+      search = "",
+      category = "",
+      minPrice = 0,
+      maxPrice = 1000000,
+      page = 1,
+      limit = 6,
+      sort = "latest",
+    } = req.query;
+
+    const query = {};
+
+    // Search
+    if (search) {
+      query.title = {
+        $regex: search,
+        $options: "i",
+      };
+    }
+
+    // Category
+    if (category) {
+      query.category = category;
+    }
+
+    // Price
+    query.price = {
+      $gte: Number(minPrice),
+      $lte: Number(maxPrice),
+    };
+
+    // Sorting
+    let sortOption = {};
+
+    switch (sort) {
+      case "priceLow":
+        sortOption = { price: 1 };
+        break;
+
+      case "priceHigh":
+        sortOption = { price: -1 };
+        break;
+
+      case "oldest":
+        sortOption = { createdAt: 1 };
+        break;
+
+      default:
+        sortOption = { createdAt: -1 };
+    }
+
+    const totalCourses = await Course.countDocuments(query);
+
+    const courses = await Course.find(query)
       .populate("instructor", "name email")
-      .sort({ createdAt: -1 });
+      .sort(sortOption)
+      .skip((page - 1) * limit)
+      .limit(Number(limit));
 
     res.status(200).json({
       success: true,
-      count: courses.length,
+      totalCourses,
+      currentPage: Number(page),
+      totalPages: Math.ceil(
+        totalCourses / Number(limit)
+      ),
       courses,
     });
   } catch (error) {
+    console.log(error);
+
     res.status(500).json({
       success: false,
       message: error.message,
