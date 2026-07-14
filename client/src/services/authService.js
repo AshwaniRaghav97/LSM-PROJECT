@@ -19,3 +19,27 @@ export const getProfile = async () => {
   const response = await API.get("/auth/profile");
   return response.data;
 };
+
+// Forgot Password
+export const forgotPassword = async (email) => {
+  const response = await API.post("/auth/forgot-password", {
+    email,
+  });
+
+  return response.data;
+};
+
+// Reset Password
+export const resetPassword = async (
+  token,
+  password
+) => {
+  const response = await API.put(
+    `/auth/reset-password/${token}`,
+    {
+      password,
+    }
+  );
+
+  return response.data;
+};

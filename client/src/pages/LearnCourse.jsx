@@ -23,7 +23,7 @@ const LearnCourse = () => {
 
   useEffect(() => {
     fetchCourse();
-  }, []);
+  }, [courseId]);
 
   const fetchCourse = async () => {
     try {
@@ -87,6 +87,7 @@ const LearnCourse = () => {
       const link = document.createElement("a");
 
       link.href = url;
+
       link.download = `${course.title}-Certificate.pdf`;
 
       document.body.appendChild(link);
@@ -100,6 +101,7 @@ const LearnCourse = () => {
       toast.success("Certificate Downloaded");
     } catch (error) {
       console.log(error);
+
       toast.error(
         error.response?.data?.message ||
           "Unable to download certificate"
@@ -142,7 +144,8 @@ const LearnCourse = () => {
       </MainLayout>
     );
   }
-    return (
+
+  return (
     <MainLayout>
       <div className="max-w-7xl mx-auto py-10 px-5">
 
@@ -152,7 +155,6 @@ const LearnCourse = () => {
 
         <div className="grid md:grid-cols-3 gap-8">
 
-          {/* Left Side */}
           <div className="md:col-span-2">
 
             {currentLecture ? (
@@ -172,21 +174,24 @@ const LearnCourse = () => {
                   {currentLecture.description}
                 </p>
 
-                {/* Progress */}
                 <div className="mt-8">
 
                   <div className="flex justify-between mb-2">
+
                     <span className="font-semibold">
                       Course Progress
                     </span>
 
-                    <span>{progress.percentage}%</span>
+                    <span>
+                      {progress.percentage}%
+                    </span>
+
                   </div>
 
                   <div className="w-full h-3 bg-gray-300 rounded-full">
 
                     <div
-                      className="h-3 bg-green-600 rounded-full"
+                      className="h-3 bg-green-600 rounded-full transition-all"
                       style={{
                         width: `${progress.percentage}%`,
                       }}
@@ -196,7 +201,6 @@ const LearnCourse = () => {
 
                 </div>
 
-                {/* Buttons */}
                 <div className="flex flex-wrap gap-4 mt-6">
 
                   <button
@@ -214,10 +218,8 @@ const LearnCourse = () => {
                       📜 Download Certificate
                     </button>
                   )}
+                                  </div>
 
-                </div>
-
-                {/* Previous / Next */}
                 <div className="flex gap-4 mt-5">
 
                   <button
@@ -237,7 +239,8 @@ const LearnCourse = () => {
                     disabled={
                       course.lectures.findIndex(
                         (l) => l._id === currentLecture._id
-                      ) === course.lectures.length - 1
+                      ) ===
+                      course.lectures.length - 1
                     }
                     className="bg-blue-600 disabled:bg-blue-300 text-white px-6 py-3 rounded-lg"
                   >
@@ -287,8 +290,10 @@ const LearnCourse = () => {
                       <p>{lecture.title}</p>
                     </div>
 
-                    {progress.completedLectures?.includes(
-                      lecture._id
+                    {progress.completedLectures?.some(
+                      (item) =>
+                        (item._id || item).toString() ===
+                        lecture._id.toString()
                     ) && (
                       <span className="text-green-600 text-xl">
                         ✔

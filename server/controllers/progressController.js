@@ -8,6 +8,15 @@ export const markLectureComplete = async (req, res) => {
   try {
     const { courseId, lectureId } = req.params;
 
+    const course = await Course.findById(courseId).populate("lectures");
+
+    if (!course) {
+      return res.status(404).json({
+        success: false,
+        message: "Course not found",
+      });
+    }
+
     let progress = await Progress.findOne({
       user: req.user._id,
       course: courseId,
@@ -22,14 +31,15 @@ export const markLectureComplete = async (req, res) => {
       });
     }
 
-    if (!progress.completedLectures.includes(lectureId)) {
+    const alreadyCompleted = progress.completedLectures.some(
+      (id) => id.equals(lectureId)
+    );
+
+    if (!alreadyCompleted) {
       progress.completedLectures.push(lectureId);
     }
 
-    // Save last watched lecture
     progress.lastLecture = lectureId;
-
-    const course = await Course.findById(courseId).populate("lectures");
 
     const totalLectures = course.lectures.length;
     const completedLectures = progress.completedLectures.length;
@@ -37,7 +47,7 @@ export const markLectureComplete = async (req, res) => {
     progress.percentage =
       totalLectures === 0
         ? 0
-        : Math.floor((completedLectures / totalLectures) * 100);
+        : Math.round((completedLectures / totalLectures) * 100);
 
     progress.completed = progress.percentage === 100;
 
@@ -48,11 +58,16 @@ export const markLectureComplete = async (req, res) => {
       message: "Lecture marked as completed",
       progress,
     });
+
   } catch (error) {
+
+    console.log(error);
+
     res.status(500).json({
       success: false,
       message: error.message,
     });
+
   }
 };
 
@@ -63,29 +78,39 @@ export const getProgress = async (req, res) => {
   try {
     const { courseId } = req.params;
 
-    let progress = await Progress.findOne({
+    const progress = await Progress.findOne({
       user: req.user._id,
       course: courseId,
-    }).populate("lastLecture");
+    })
+      .populate("completedLectures")
+      .populate("lastLecture");
 
     if (!progress) {
-      progress = {
-        completedLectures: [],
-        percentage: 0,
-        completed: false,
-        lastLecture: null,
-      };
+      return res.status(200).json({
+        success: true,
+        progress: {
+          completedLectures: [],
+          percentage: 0,
+          completed: false,
+          lastLecture: null,
+        },
+      });
     }
 
     res.status(200).json({
       success: true,
       progress,
     });
+
   } catch (error) {
+
+    console.log(error);
+
     res.status(500).json({
       success: false,
       message: error.message,
     });
+
   }
 };
 
@@ -105,10 +130,15 @@ export const resetProgress = async (req, res) => {
       success: true,
       message: "Progress reset successfully",
     });
+
   } catch (error) {
+
+    console.log(error);
+
     res.status(500).json({
       success: false,
       message: error.message,
     });
+
   }
 };

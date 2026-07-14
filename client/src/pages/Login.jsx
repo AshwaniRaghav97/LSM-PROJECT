@@ -41,7 +41,10 @@ const Login = () => {
           Login
         </h1>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="space-y-5"
+        >
 
           <div>
             <label className="block mb-2 font-medium">
@@ -62,9 +65,11 @@ const Login = () => {
                 {errors.email.message}
               </p>
             )}
+
           </div>
 
           <div>
+
             <label className="block mb-2 font-medium">
               Password
             </label>
@@ -83,13 +88,25 @@ const Login = () => {
                 {errors.password.message}
               </p>
             )}
+
+          </div>
+
+          <div className="flex justify-end">
+            <Link
+              to="/forgot-password"
+              className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+            >
+              Forgot Password?
+            </Link>
           </div>
 
           <button
             disabled={isSubmitting}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700"
+            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition"
           >
-            {isSubmitting ? "Logging in..." : "Login"}
+            {isSubmitting
+              ? "Logging in..."
+              : "Login"}
           </button>
 
         </form>
@@ -98,7 +115,7 @@ const Login = () => {
           Don't have an account?{" "}
           <Link
             to="/register"
-            className="text-blue-600 font-semibold"
+            className="text-blue-600 font-semibold hover:underline"
           >
             Register
           </Link>

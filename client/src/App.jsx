@@ -16,6 +16,8 @@ import ManageLectures from "./pages/ManageLectures";
 import MyLearning from "./pages/MyLearning";
 import LearnCourse from "./pages/LearnCourse";
 import InstructorDashboard from "./pages/InstructorDashboard";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
   return (
@@ -42,6 +44,16 @@ function App() {
            path="/instructor-dashboard"
             element={<InstructorDashboard />}
           /> 
+
+          <Route
+  path="/forgot-password"
+  element={<ForgotPassword />}
+/>
+
+<Route
+  path="/reset-password/:token"
+  element={<ResetPassword />}
+/>
         <Route
   path="/learn/:courseId"
   element={

@@ -4,6 +4,9 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import generateToken from "../utils/generateToken.js";
 
+import crypto from "crypto";
+import sendEmail from "../utils/sendEmail.js";
+
 export const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -131,4 +134,142 @@ export const logoutUser = (req, res) => {
         message: "Logout Successful"
     });
 
+};
+
+// ======================
+// Forgot Password
+// ======================
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+
+    user.resetPasswordToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+
+    user.resetPasswordExpire =
+      Date.now() + 15 * 60 * 1000;
+
+    await user.save();
+
+    const resetUrl =
+      `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
+
+    const message = `
+      <h2>Password Reset Request</h2>
+
+      <p>You requested to reset your password.</p>
+
+      <p>
+        Click the button below:
+      </p>
+
+      <a
+        href="${resetUrl}"
+        style="
+          background:#2563eb;
+          color:white;
+          padding:12px 24px;
+          text-decoration:none;
+          border-radius:6px;
+        "
+      >
+        Reset Password
+      </a>
+
+      <p>
+        This link will expire in 15 minutes.
+      </p>
+    `;
+
+    await sendEmail({
+      email: user.email,
+      subject: "Reset Password",
+      message,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Reset link sent to your email",
+    });
+
+  } catch (error) {
+
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+
+  }
+};
+
+// ======================
+// Reset Password
+// ======================
+export const resetPassword = async (req, res) => {
+  try {
+    const resetPasswordToken = crypto
+      .createHash("sha256")
+      .update(req.params.token)
+      .digest("hex");
+
+    const user = await User.findOne({
+      resetPasswordToken,
+      resetPasswordExpire: {
+        $gt: Date.now(),
+      },
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid or expired reset token",
+      });
+    }
+
+    const { password } = req.body;
+
+    if (!password) {
+      return res.status(400).json({
+        success: false,
+        message: "Password is required",
+      });
+    }
+
+    user.password = await bcrypt.hash(password, 10);
+
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Password reset successfully",
+    });
+
+  } catch (error) {
+
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+
+  }
 };
