@@ -18,7 +18,7 @@ import LearnCourse from "./pages/LearnCourse";
 import InstructorDashboard from "./pages/InstructorDashboard";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
-
+import VerifyCertificate from "./pages/VerifyCertificate";
 function App() {
   return (
     <BrowserRouter>
@@ -44,6 +44,11 @@ function App() {
            path="/instructor-dashboard"
             element={<InstructorDashboard />}
           /> 
+
+          <Route
+              path="/verify-certificate/:certificateId"
+              element={<VerifyCertificate />}
+          />
 
           <Route
   path="/forgot-password"
