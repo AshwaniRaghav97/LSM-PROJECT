@@ -7,6 +7,9 @@ import generateToken from "../utils/generateToken.js";
 import crypto from "crypto";
 import sendEmail from "../utils/sendEmail.js";
 
+import cloudinary from "../config/cloudinary.js";
+import streamifier from "streamifier";
+
 export const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -265,6 +268,71 @@ export const resetPassword = async (req, res) => {
   } catch (error) {
 
     console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+
+  }
+};
+
+export const updateProfile = async (req, res) => {
+  try {
+
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    if (req.body.name) {
+      user.name = req.body.name;
+    }
+
+    if (req.file) {
+
+      const uploadFromBuffer = () =>
+        new Promise((resolve, reject) => {
+
+          const stream =
+            cloudinary.uploader.upload_stream(
+              {
+                folder: "codelearn-users",
+              },
+              (error, result) => {
+
+                if (error) return reject(error);
+
+                resolve(result);
+
+              }
+            );
+
+          streamifier
+            .createReadStream(req.file.buffer)
+            .pipe(stream);
+
+        });
+
+      const result = await uploadFromBuffer();
+
+      user.avatar = result.secure_url;
+
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      user,
+    });
+
+  } catch (error) {
 
     res.status(500).json({
       success: false,

@@ -37,6 +37,12 @@ const progressSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+
+    // Prevent completion email from sending multiple times
+    emailSent: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
@@ -53,9 +59,6 @@ progressSchema.index(
   }
 );
 
-const Progress = mongoose.model(
-  "Progress",
-  progressSchema
-);
+const Progress = mongoose.model("Progress", progressSchema);
 
 export default Progress;

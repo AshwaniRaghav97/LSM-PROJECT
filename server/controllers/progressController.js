@@ -1,5 +1,6 @@
 import Progress from "../models/Progress.js";
 import Course from "../models/Course.js";
+import sendEmail from "../utils/sendEmail.js";
 
 // ==========================
 // Mark Lecture Complete
@@ -8,7 +9,9 @@ export const markLectureComplete = async (req, res) => {
   try {
     const { courseId, lectureId } = req.params;
 
-    const course = await Course.findById(courseId).populate("lectures");
+    const course = await Course.findById(courseId)
+      .populate("lectures")
+      .populate("instructor", "name");
 
     if (!course) {
       return res.status(404).json({
@@ -28,11 +31,14 @@ export const markLectureComplete = async (req, res) => {
         course: courseId,
         completedLectures: [],
         lastLecture: lectureId,
+        percentage: 0,
+        completed: false,
+        emailSent: false,
       });
     }
 
-    const alreadyCompleted = progress.completedLectures.some(
-      (id) => id.equals(lectureId)
+    const alreadyCompleted = progress.completedLectures.some((id) =>
+      id.equals(lectureId)
     );
 
     if (!alreadyCompleted) {
@@ -53,24 +59,84 @@ export const markLectureComplete = async (req, res) => {
 
     await progress.save();
 
+    // ==========================
+    // Send Completion Email Once
+    // ==========================
+    if (progress.completed && !progress.emailSent) {
+      const message = `
+      <div style="font-family:Arial;padding:30px">
+
+        <h1 style="color:#16a34a">
+          🎉 Congratulations ${req.user.name}
+        </h1>
+
+        <p style="font-size:18px">
+          You have successfully completed
+          <strong>${course.title}</strong>.
+        </p>
+
+        <p>
+          <strong>Instructor:</strong>
+          ${course.instructor?.name || "CodeLearn"}
+        </p>
+
+        <p>
+          <strong>Completion Date:</strong>
+          ${new Date().toLocaleDateString()}
+        </p>
+
+        <hr>
+
+        <p>
+          Your certificate is now available inside your LMS account.
+        </p>
+
+        <p>
+          Keep learning and keep growing 🚀
+        </p>
+
+        <br>
+
+        <h3>
+          Team CodeLearn ❤️
+        </h3>
+
+      </div>
+      `;
+
+      try {
+        await sendEmail({
+          email: req.user.email,
+          subject: "🎉 Congratulations! Course Completed",
+          message,
+        });
+
+        progress.emailSent = true;
+        await progress.save();
+
+        console.log("Completion email sent.");
+      } catch (emailError) {
+        console.log(
+          "Email Error:",
+          emailError.message
+        );
+      }
+    }
+
     res.status(200).json({
       success: true,
       message: "Lecture marked as completed",
       progress,
     });
-
   } catch (error) {
-
     console.log(error);
 
     res.status(500).json({
       success: false,
       message: error.message,
     });
-
   }
 };
-
 // ==========================
 // Get Progress
 // ==========================
@@ -93,6 +159,7 @@ export const getProgress = async (req, res) => {
           percentage: 0,
           completed: false,
           lastLecture: null,
+          emailSent: false,
         },
       });
     }
@@ -101,16 +168,13 @@ export const getProgress = async (req, res) => {
       success: true,
       progress,
     });
-
   } catch (error) {
-
     console.log(error);
 
     res.status(500).json({
       success: false,
       message: error.message,
     });
-
   }
 };
 
@@ -130,15 +194,12 @@ export const resetProgress = async (req, res) => {
       success: true,
       message: "Progress reset successfully",
     });
-
   } catch (error) {
-
     console.log(error);
 
     res.status(500).json({
       success: false,
       message: error.message,
     });
-
   }
 };

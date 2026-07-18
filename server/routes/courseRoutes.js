@@ -1,5 +1,5 @@
 import express from "express";
-import upload from "../middleware/uploadMiddleware.js";
+import upload from "../middleware/uploadVideo.js";
 import {
   createCourse,
   getAllCourses,
