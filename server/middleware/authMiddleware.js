@@ -27,4 +27,4 @@ export const protect = async (req, res, next) => {
       message: "Invalid Token",
     });
   }
-};
+}
