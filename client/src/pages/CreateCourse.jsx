@@ -8,13 +8,17 @@ import { createCourse } from "../services/courseService";
 
 const CreateCourse = () => {
   const navigate = useNavigate();
+
   const [preview, setPreview] = useState(null);
+  const [fileName, setFileName] = useState("");
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm();
+
+  const thumbnailRegister = register("thumbnail");
 
   const onSubmit = async (data) => {
     try {
@@ -62,11 +66,13 @@ const CreateCourse = () => {
             <input
               type="text"
               className="w-full border rounded-lg px-4 py-3"
+              placeholder="Enter Course Title"
               {...register("title", {
                 required: "Title is required",
               })}
             />
-            <p className="text-red-500 text-sm">
+
+            <p className="text-red-500 text-sm mt-1">
               {errors.title?.message}
             </p>
           </div>
@@ -79,11 +85,13 @@ const CreateCourse = () => {
             <textarea
               rows="4"
               className="w-full border rounded-lg px-4 py-3"
+              placeholder="Enter Description"
               {...register("description", {
                 required: "Description is required",
               })}
             />
-            <p className="text-red-500 text-sm">
+
+            <p className="text-red-500 text-sm mt-1">
               {errors.description?.message}
             </p>
           </div>
@@ -96,11 +104,13 @@ const CreateCourse = () => {
             <input
               type="number"
               className="w-full border rounded-lg px-4 py-3"
+              placeholder="Enter Price"
               {...register("price", {
                 required: "Price is required",
               })}
             />
-            <p className="text-red-500 text-sm">
+
+            <p className="text-red-500 text-sm mt-1">
               {errors.price?.message}
             </p>
           </div>
@@ -113,11 +123,13 @@ const CreateCourse = () => {
             <input
               type="text"
               className="w-full border rounded-lg px-4 py-3"
+              placeholder="Enter Category"
               {...register("category", {
                 required: "Category is required",
               })}
             />
-            <p className="text-red-500 text-sm">
+
+            <p className="text-red-500 text-sm mt-1">
               {errors.category?.message}
             </p>
           </div>
@@ -131,26 +143,38 @@ const CreateCourse = () => {
               type="file"
               accept="image/*"
               className="w-full border rounded-lg px-4 py-3"
-              {...register("thumbnail")}
+              {...thumbnailRegister}
               onChange={(e) => {
-                if (e.target.files[0]) {
-                  setPreview(URL.createObjectURL(e.target.files[0]));
+                thumbnailRegister.onChange(e);
+
+                if (e.target.files && e.target.files[0]) {
+                  setPreview(
+                    URL.createObjectURL(e.target.files[0])
+                  );
+                  setFileName(e.target.files[0].name);
                 }
               }}
             />
 
+            {fileName && (
+              <p className="mt-2 text-sm text-gray-600">
+                📁 {fileName}
+              </p>
+            )}
+
             {preview && (
               <img
                 src={preview}
-                alt="Preview"
-                className="mt-4 h-48 w-full object-cover rounded-lg"
+                alt="Thumbnail Preview"
+                className="mt-4 h-52 w-full object-cover rounded-lg border"
               />
             )}
           </div>
 
           <button
+            type="submit"
             disabled={isSubmitting}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700"
+            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition"
           >
             {isSubmitting ? "Creating..." : "Create Course"}
           </button>
