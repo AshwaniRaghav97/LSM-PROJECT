@@ -19,6 +19,7 @@ import InstructorDashboard from "./pages/InstructorDashboard";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import VerifyCertificate from "./pages/VerifyCertificate";
+import Profile from "./pages/Profile";
 function App() {
   return (
     <BrowserRouter>
@@ -81,6 +82,15 @@ function App() {
             <ProtectedRoute>
                <EditCourse />
             </ProtectedRoute>
+        }
+      />
+
+      <Route
+          path="/profile"
+          element={
+        <ProtectedRoute>
+          <Profile />
+        </ProtectedRoute>
         }
       />
 

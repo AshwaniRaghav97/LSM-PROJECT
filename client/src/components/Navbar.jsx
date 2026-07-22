@@ -77,6 +77,13 @@ const Navbar = () => {
                   My Learning
               </Link>
 
+              <Link
+                 to="/profile"
+                 className="font-medium text-gray-700 hover:text-blue-600"
+                  >
+                 Profile
+              </Link>
+
               
 
               <span className="px-3 py-2 bg-blue-100 text-blue-700 rounded-full font-semibold whitespace-nowrap">
