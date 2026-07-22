@@ -5,8 +5,18 @@ export const protect = async (req, res, next) => {
   try {
     let token;
 
-    if (req.cookies.token) {
+    // Cookie se token
+    if (req.cookies?.token) {
       token = req.cookies.token;
+    }
+
+    // Authorization Header se token
+    if (
+      !token &&
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer ")
+    ) {
+      token = req.headers.authorization.split(" ")[1];
     }
 
     if (!token) {
@@ -20,11 +30,20 @@ export const protect = async (req, res, next) => {
 
     req.user = await User.findById(decoded.id).select("-password");
 
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
     next();
   } catch (error) {
+    console.log(error);
+
     return res.status(401).json({
       success: false,
       message: "Invalid Token",
     });
   }
-}
+};

@@ -22,7 +22,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://YOUR-VERCEL-DOMAIN.vercel.app"
+      "https://lsm-project-5mjs.vercel.app",
     ],
     credentials: true,
   })
