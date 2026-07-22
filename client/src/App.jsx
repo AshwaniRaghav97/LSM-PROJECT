@@ -20,6 +20,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import VerifyCertificate from "./pages/VerifyCertificate";
 import Profile from "./pages/Profile";
+import EditProfile from "./pages/EditProfile";
 function App() {
   return (
     <BrowserRouter>
@@ -126,6 +127,15 @@ function App() {
             <ProtectedRoute>
               <CreateCourse />
             </ProtectedRoute>
+          }
+        />
+
+        <Route
+            path="/edit-profile"
+            element={
+           <ProtectedRoute>
+            <EditProfile />
+          </ProtectedRoute>
           }
         />
 

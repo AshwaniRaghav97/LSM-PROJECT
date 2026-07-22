@@ -20,7 +20,26 @@ export const getProfile = async () => {
   return response.data;
 };
 
+// ======================
+// Update Profile
+// ======================
+export const updateProfile = async (formData) => {
+  const response = await API.put(
+    "/auth/update-profile",
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+
+  return response.data;
+};
+
+// ======================
 // Forgot Password
+// ======================
 export const forgotPassword = async (email) => {
   const response = await API.post("/auth/forgot-password", {
     email,
@@ -29,11 +48,10 @@ export const forgotPassword = async (email) => {
   return response.data;
 };
 
+// ======================
 // Reset Password
-export const resetPassword = async (
-  token,
-  password
-) => {
+// ======================
+export const resetPassword = async (token, password) => {
   const response = await API.put(
     `/auth/reset-password/${token}`,
     {
