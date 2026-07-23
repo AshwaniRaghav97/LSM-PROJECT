@@ -2,8 +2,8 @@ import crypto from "crypto";
 import razorpay from "../config/razorpay.js";
 import Payment from "../models/Payment.js";
 import Course from "../models/Course.js";
+import User from "../models/User.js";
 
-// Create Razorpay Order
 export const createOrder = async (req, res) => {
   try {
     const { courseId } = req.body;
@@ -73,9 +73,7 @@ export const verifyPayment = async (req, res) => {
     }
 
     await Payment.findOneAndUpdate(
-      {
-        orderId: razorpay_order_id,
-      },
+      { orderId: razorpay_order_id },
       {
         paymentId: razorpay_payment_id,
         signature: razorpay_signature,
@@ -86,6 +84,12 @@ export const verifyPayment = async (req, res) => {
     await Course.findByIdAndUpdate(courseId, {
       $addToSet: {
         students: req.user._id,
+      },
+    });
+
+    await User.findByIdAndUpdate(req.user._id, {
+      $addToSet: {
+        enrolledCourses: courseId,
       },
     });
 
