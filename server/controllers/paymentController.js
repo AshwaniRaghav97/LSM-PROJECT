@@ -4,6 +4,9 @@ import Payment from "../models/Payment.js";
 import Course from "../models/Course.js";
 import User from "../models/User.js";
 
+// ======================
+// Create Razorpay Order
+// ======================
 export const createOrder = async (req, res) => {
   try {
     const { courseId } = req.body;
@@ -46,6 +49,9 @@ export const createOrder = async (req, res) => {
   }
 };
 
+// ======================
+// Verify Payment
+// ======================
 export const verifyPayment = async (req, res) => {
   try {
     const {
@@ -72,6 +78,7 @@ export const verifyPayment = async (req, res) => {
       });
     }
 
+    // Update Payment
     await Payment.findOneAndUpdate(
       { orderId: razorpay_order_id },
       {
@@ -81,23 +88,37 @@ export const verifyPayment = async (req, res) => {
       }
     );
 
-    await Course.findByIdAndUpdate(courseId, {
-      $addToSet: {
-        students: req.user._id,
-      },
-    });
+    // Get User & Course
+    const user = await User.findById(req.user._id);
+    const course = await Course.findById(courseId);
 
-    await User.findByIdAndUpdate(req.user._id, {
-      $addToSet: {
-        enrolledCourses: courseId,
-      },
-    });
+    if (!user || !course) {
+      return res.status(404).json({
+        success: false,
+        message: "User or Course not found",
+      });
+    }
+
+    // Enroll User
+    if (!user.enrolledCourses.includes(courseId)) {
+      user.enrolledCourses.push(courseId);
+    }
+
+    if (!course.students.includes(req.user._id)) {
+      course.students.push(req.user._id);
+    }
+
+    await user.save();
+    await course.save();
 
     res.status(200).json({
       success: true,
-      message: "Payment Successful",
+      message: "Payment Successful. Course Enrolled Successfully.",
     });
+
   } catch (error) {
+    console.log(error);
+
     res.status(500).json({
       success: false,
       message: error.message,
