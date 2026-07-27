@@ -1,6 +1,20 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, NavLink } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import toast from "react-hot-toast";
+
+import {
+  Menu,
+  X,
+  Home,
+  BookOpen,
+  LayoutDashboard,
+  GraduationCap,
+  User,
+  PlusCircle,
+  BookMarked,
+  LogOut,
+} from "lucide-react";
 
 import { logout } from "../features/auth/authSlice";
 import { logoutUser } from "../services/authService";
@@ -12,6 +26,8 @@ const Navbar = () => {
     (state) => state.auth
   );
 
+  const [menuOpen, setMenuOpen] = useState(false);
+
   const handleLogout = async () => {
     try {
       await logoutUser();
@@ -19,104 +35,324 @@ const Navbar = () => {
       dispatch(logout());
 
       toast.success("Logout Successful");
+
+      setMenuOpen(false);
     } catch (error) {
       console.log(error);
       toast.error("Logout Failed");
     }
   };
 
-  return (
-    <nav className="sticky top-0 z-50 bg-white shadow-md border-b">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex flex-wrap items-center justify-between gap-4">
-        
-        {/* Logo */}
-        <Link
-          to="/"
-          className="text-3xl font-extrabold text-blue-600 hover:text-blue-700 transition"
-        >
-          CodeLearn
-        </Link>
+  const navLink =
+    "flex items-center gap-2 px-4 py-2 rounded-xl text-gray-700 font-medium transition-all duration-300 hover:bg-blue-50 hover:text-blue-600";
 
-        {/* Navigation */}
-        <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
+  const activeLink =
+    "bg-blue-600 text-white shadow-md";
+
+  return (
+    <header className="sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b border-gray-200">
+      <div className="max-w-7xl mx-auto px-6">
+
+        <div className="flex items-center justify-between h-20">
+
+          {/* Logo */}
 
           <Link
             to="/"
-            className="font-medium text-gray-700 hover:text-blue-600 transition"
+            className="flex items-center gap-3"
           >
-            Home
+            <div className="h-12 w-12 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-lg">
+              C
+            </div>
+
+            <div>
+              <h1 className="text-2xl font-extrabold text-gray-800">
+                CodeLearn
+              </h1>
+
+              <p className="text-xs text-gray-500">
+                Learn • Build • Grow
+              </p>
+            </div>
           </Link>
 
-          <Link
-            to="/courses"
-            className="font-medium text-gray-700 hover:text-blue-600 transition"
+          {/* Desktop Menu */}
+
+          <div className="hidden lg:flex items-center gap-2">
+
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                `${navLink} ${isActive ? activeLink : ""}`
+              }
+            >
+              <Home size={18} />
+              Home
+            </NavLink>
+
+            <NavLink
+              to="/courses"
+              className={({ isActive }) =>
+                `${navLink} ${isActive ? activeLink : ""}`
+              }
+            >
+              <BookOpen size={18} />
+              Courses
+            </NavLink>
+
+            {isAuthenticated && (
+              <>
+                <NavLink
+                  to="/dashboard"
+                  className={({ isActive }) =>
+                    `${navLink} ${isActive ? activeLink : ""}`
+                  }
+                >
+                  <LayoutDashboard size={18} />
+                  Dashboard
+                </NavLink>
+
+                <NavLink
+                  to="/my-courses"
+                  className={({ isActive }) =>
+                    `${navLink} ${isActive ? activeLink : ""}`
+                  }
+                >
+                  <BookMarked size={18} />
+                  My Courses
+                </NavLink>
+
+                <NavLink
+                  to="/create-course"
+                  className={({ isActive }) =>
+                    `${navLink} ${isActive ? activeLink : ""}`
+                  }
+                >
+                  <PlusCircle size={18} />
+                  Create
+                </NavLink>
+
+                <NavLink
+                  to="/my-learning"
+                  className={({ isActive }) =>
+                    `${navLink} ${isActive ? activeLink : ""}`
+                  }
+                >
+                  <GraduationCap size={18} />
+                  Learning
+                </NavLink>
+
+                <NavLink
+                  to="/profile"
+                  className={({ isActive }) =>
+                    `${navLink} ${isActive ? activeLink : ""}`
+                  }
+                >
+                  <User size={18} />
+                  Profile
+                </NavLink>
+              </>
+            )}
+
+          </div>
+                    {/* Right Side */}
+
+          <div className="hidden lg:flex items-center gap-4">
+
+            {isAuthenticated ? (
+              <>
+                <div className="flex items-center gap-3">
+
+                  <div className="h-11 w-11 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex items-center justify-center text-lg font-bold shadow-md">
+                    {user?.name?.charAt(0).toUpperCase()}
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-semibold text-gray-800">
+                      {user?.name}
+                    </p>
+
+                    <p className="text-xs text-gray-500">
+                      {user?.role}
+                    </p>
+                  </div>
+
+                </div>
+
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg"
+                >
+                  <LogOut size={18} />
+                  Logout
+                </button>
+
+              </>
+            ) : (
+              <div className="flex items-center gap-3">
+
+                <Link
+                  to="/login"
+                  className="px-5 py-2.5 rounded-xl font-medium border border-blue-600 text-blue-600 hover:bg-blue-50 transition"
+                >
+                  Login
+                </Link>
+
+                <Link
+                  to="/register"
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold shadow-md hover:shadow-xl transition"
+                >
+                  Register
+                </Link>
+
+              </div>
+            )}
+
+          </div>
+
+          {/* Mobile Menu Button */}
+
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="lg:hidden"
           >
-            Courses
-          </Link>
+            {menuOpen ? (
+              <X size={30} />
+            ) : (
+              <Menu size={30} />
+            )}
+          </button>
 
-          {isAuthenticated ? (
-            <>
-              <Link
-                to="/dashboard"
-                className="font-medium text-gray-700 hover:text-blue-600 transition"
-              >
-                Dashboard
-              </Link>
-
-              <Link to="/my-courses"
-                className="font-medium hover:text-blue-600">
-                My Courses
-              </Link>
-
-              <Link to="/create-course"
-                  className="font-medium text-gray-700 hover:text-blue-600">
-                  Create Course
-              </Link>
-
-              <Link to="/my-learning">
-                  My Learning
-              </Link>
-
-              <Link
-                 to="/profile"
-                 className="font-medium text-gray-700 hover:text-blue-600"
-                  >
-                 Profile
-              </Link>
-
-              
-
-              <span className="px-3 py-2 bg-blue-100 text-blue-700 rounded-full font-semibold whitespace-nowrap">
-                👋 {user?.name}
-              </span>
-
-              <button
-                onClick={handleLogout}
-                className="bg-red-500 text-white px-5 py-2 rounded-lg hover:bg-red-600 transition whitespace-nowrap"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <>
-              <Link
-                to="/login"
-                className="font-medium text-gray-700 hover:text-blue-600 transition"
-              >
-                Login
-              </Link>
-
-              <Link
-                to="/register"
-                className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition whitespace-nowrap"
-              >
-                Register
-              </Link>
-            </>
-          )}
         </div>
+
       </div>
-    </nav>
+
+      {/* Mobile Menu */}
+
+      {menuOpen && (
+
+        <div className="lg:hidden bg-white border-t shadow-xl">
+
+          <div className="flex flex-col p-5 gap-2">
+
+            <NavLink
+              to="/"
+              onClick={() => setMenuOpen(false)}
+              className={({ isActive }) =>
+                `${navLink} ${isActive ? activeLink : ""}`
+              }
+            >
+              <Home size={18} />
+              Home
+            </NavLink>
+
+            <NavLink
+              to="/courses"
+              onClick={() => setMenuOpen(false)}
+              className={({ isActive }) =>
+                `${navLink} ${isActive ? activeLink : ""}`
+              }
+            >
+              <BookOpen size={18} />
+              Courses
+            </NavLink>
+
+            {isAuthenticated ? (
+              <>
+
+                <NavLink
+                  to="/dashboard"
+                  onClick={() => setMenuOpen(false)}
+                  className={({ isActive }) =>
+                    `${navLink} ${isActive ? activeLink : ""}`
+                  }
+                >
+                  <LayoutDashboard size={18} />
+                  Dashboard
+                </NavLink>
+
+                <NavLink
+                  to="/my-courses"
+                  onClick={() => setMenuOpen(false)}
+                  className={({ isActive }) =>
+                    `${navLink} ${isActive ? activeLink : ""}`
+                  }
+                >
+                  <BookMarked size={18} />
+                  My Courses
+                </NavLink>
+
+                <NavLink
+                  to="/create-course"
+                  onClick={() => setMenuOpen(false)}
+                  className={({ isActive }) =>
+                    `${navLink} ${isActive ? activeLink : ""}`
+                  }
+                >
+                  <PlusCircle size={18} />
+                  Create Course
+                </NavLink>
+
+                <NavLink
+                  to="/my-learning"
+                  onClick={() => setMenuOpen(false)}
+                  className={({ isActive }) =>
+                    `${navLink} ${isActive ? activeLink : ""}`
+                  }
+                >
+                  <GraduationCap size={18} />
+                  My Learning
+                </NavLink>
+
+                <NavLink
+                  to="/profile"
+                  onClick={() => setMenuOpen(false)}
+                  className={({ isActive }) =>
+                    `${navLink} ${isActive ? activeLink : ""}`
+                  }
+                >
+                  <User size={18} />
+                  Profile
+                </NavLink>
+
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center justify-center gap-2 mt-4 bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl transition"
+                >
+                  <LogOut size={18} />
+                  Logout
+                </button>
+
+              </>
+            ) : (
+              <>
+
+                <Link
+                  to="/login"
+                  onClick={() => setMenuOpen(false)}
+                  className="text-center py-3 rounded-xl border border-blue-600 text-blue-600 font-medium"
+                >
+                  Login
+                </Link>
+
+                <Link
+                  to="/register"
+                  onClick={() => setMenuOpen(false)}
+                  className="text-center py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold"
+                >
+                  Register
+                </Link>
+
+              </>
+            )}
+
+          </div>
+
+        </div>
+
+      )}
+
+    </header>
   );
 };
 
