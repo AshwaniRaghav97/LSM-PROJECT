@@ -364,7 +364,7 @@ const ManageLectures = () => {
 
     </MainLayout>
 
-  )
+  );
 
 };
 
